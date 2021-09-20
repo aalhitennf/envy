@@ -9,7 +9,6 @@ Cargo.toml
 
 By default envy tries to read from following files in your project folder.  
 
-
     .env.debug
     .env.test
     .env
@@ -17,15 +16,15 @@ By default envy tries to read from following files in your project folder.
 
 You can also create freely named custom file.
 
-Define env file content:  
+Define file content:  
 
     # You can comment lines
-    DB_PORT=1234
-    DB_URI=http://localhost
-    DB_PASSWORD=SecretPassword # You can also comment at end of lines
+    PORT=1234
+    URI=http://localhost/
+    PASSWORD=SecretPassword # You can also comment at end of lines
 
 
-In code:
+Code:
 
     use envy::Envy;
 
@@ -48,5 +47,8 @@ In code:
     // to avoid crashing at least
     let port = envy.get("PORT");
 
+    assert_eq!(port, String::from("1234"));
 
+    let nope = envy.get("SECRET");
 
+    assert!(nope.is_empty());

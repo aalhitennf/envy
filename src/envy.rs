@@ -8,6 +8,10 @@ use std::{
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
+const TEST_FILE: &str = ".env.test";
+const DEBUG_FILE: &str = ".env.debug";
+const RELEASE_FILE: &str = ".env";
+
 #[derive(Debug, Clone)]
 pub struct Envy {
     map: HashMap<String, String>,
@@ -15,26 +19,24 @@ pub struct Envy {
 
 impl Envy {
     pub fn debug() -> Result<Envy> {
-        let map = init_hashmap(".env.debug")?;
+        let map = init_hashmap(DEBUG_FILE)?;
         Ok(Envy { map })
     }
     pub fn release() -> Result<Envy> {
-        let map = init_hashmap(".env.release")?;
+        let map = init_hashmap(RELEASE_FILE)?;
         Ok(Envy { map })
     }
     pub fn test() -> Result<Envy> {
-        let map = init_hashmap(".env.test")?;
+        let map = init_hashmap(TEST_FILE)?;
         Ok(Envy { map })
     }
-    pub fn current() -> Result<Envy> {
+    pub fn detect() -> Result<Envy> {
         let filename = if cfg!(test) {
-            ".env.test"
+            TEST_FILE
         } else if cfg!(debug_assertions) {
-            ".env.debug"
-        } else if cfg!(release) {
-            ".env.release"
+            DEBUG_FILE
         } else {
-            ".env.debug"
+            RELEASE_FILE
         };
         let map = init_hashmap(filename)?;
         Ok(Envy { map })
@@ -44,6 +46,11 @@ impl Envy {
     }
     pub fn amount(&self) -> usize {
         self.map.keys().len()
+    }
+    pub fn print_debug(&self) {
+        for key in self.map.keys() {
+            println!("{} = {}", key, self.map.get(key).unwrap())
+        }
     }
 }
 

@@ -9,9 +9,11 @@ Cargo.toml
 
 By default envy tries to read from following files in your project folder.  
 
+
     .env.debug
-    .env.release
     .env.test
+    .env
+
 
 You can also create freely named custom file.
 
@@ -28,12 +30,12 @@ In code:
     use envy::Envy;
 
     // Use current() if you want to envy detect what profile is in use
-    let envy = Envy::current().unwrap();
+    let envy = Envy::detect().unwrap();
 
     // debug() for values from .env.debug
     let envy = Envy::debug().unwrap();
 
-    // release() for values from .env.release
+    // release() for values from .env
     let envy = Envy::release().unwrap();
 
     // test() for values from .env.test

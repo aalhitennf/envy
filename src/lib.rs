@@ -69,11 +69,18 @@ mod tests {
     }
 
     #[test]
-    fn current() {
-        let envy = Envy::current().unwrap();
+    fn detect() {
+        let envy = Envy::detect().unwrap();
         assert_eq!(envy.get("ENV"), String::from("TEST"));
         assert!(envy.amount() == 4);
     }
+
+    // #[test]
+    // fn debug_print() {
+    //     let envy = Envy::current().unwrap();
+    //     envy.print_debug();
+    //     assert!(true);
+    // }
 
     // TODO Should test debug and release for current
 }

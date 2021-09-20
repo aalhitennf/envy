@@ -2,7 +2,7 @@ use std::{
     collections::HashMap,
     convert::TryFrom,
     fs::File,
-    io::{BufRead, BufReader, Lines},
+    io::{BufRead, BufReader},
     path::Path,
 };
 
@@ -19,16 +19,19 @@ pub struct Envy {
 
 impl Envy {
     pub fn debug() -> Result<Envy> {
-        let map = init_hashmap(DEBUG_FILE)?;
-        Ok(Envy { map })
+        Ok(Envy {
+            map: init_hashmap(DEBUG_FILE)?,
+        })
     }
     pub fn release() -> Result<Envy> {
-        let map = init_hashmap(RELEASE_FILE)?;
-        Ok(Envy { map })
+        Ok(Envy {
+            map: init_hashmap(RELEASE_FILE)?,
+        })
     }
     pub fn test() -> Result<Envy> {
-        let map = init_hashmap(TEST_FILE)?;
-        Ok(Envy { map })
+        Ok(Envy {
+            map: init_hashmap(TEST_FILE)?,
+        })
     }
     pub fn detect() -> Result<Envy> {
         let filename = if cfg!(test) {
@@ -38,8 +41,10 @@ impl Envy {
         } else {
             RELEASE_FILE
         };
-        let map = init_hashmap(filename)?;
-        Ok(Envy { map })
+
+        Ok(Envy {
+            map: init_hashmap(filename)?,
+        })
     }
     pub fn get(&self, key: &str) -> String {
         self.map.get(key).map_or_else(String::new, String::from)
@@ -49,7 +54,11 @@ impl Envy {
     }
     pub fn print_debug(&self) {
         for key in self.map.keys() {
-            println!("{} = {}", key, self.map.get(key).unwrap())
+            println!(
+                "{} = {}",
+                key,
+                self.map.get(key).unwrap_or(&String::from(""))
+            );
         }
     }
 }
@@ -57,11 +66,11 @@ impl Envy {
 impl TryFrom<&'static str> for Envy {
     type Error = Box<dyn std::error::Error>;
     fn try_from(value: &'static str) -> Result<Self> {
-        let map = init_hashmap(value)?;
-        Ok(Envy { map })
+        Ok(Envy {
+            map: init_hashmap(value)?,
+        })
     }
 }
-
 
 fn init_hashmap(path: &str) -> Result<HashMap<String, String>> {
     let items = read_items(Path::new(path))?;
@@ -80,13 +89,9 @@ where
     P: AsRef<Path>,
 {
     let file = File::open(path)?;
-    let mut lines = BufReader::new(file).lines();
+    let lines = BufReader::new(file).lines();
 
-    Ok(parse_lines(&mut lines))
-}
-
-fn parse_lines(lines: &mut Lines<BufReader<File>>) -> Vec<(String, String)> {
-    lines.flatten().flat_map(parse_line).collect()
+    Ok(lines.flatten().filter_map(parse_line).collect())
 }
 
 fn parse_line(mut line: String) -> Option<(String, String)> {

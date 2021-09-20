@@ -52,3 +52,6 @@ Code:
     let nope = envy.get("SECRET");
 
     assert!(nope.is_empty());
+
+    // Print all variables (sometimes it gets confusing)
+    envy.print_debug();

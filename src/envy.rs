@@ -34,9 +34,9 @@ impl Envy {
         })
     }
     pub fn detect() -> Result<Envy> {
-        let filename = if cfg!(test) {
+        let filename = if cfg!(debug_assertions) {
             TEST_FILE
-        } else if cfg!(debug_assertions) {
+        } else if cfg!(test) {
             DEBUG_FILE
         } else {
             RELEASE_FILE
